@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect,useCallback} from 'react';
 
 import MoviesList from './components/MoviesList';
 import './App.css';
@@ -24,7 +24,7 @@ function App() {
 	const [error, setError] = useState(null)
 
 	/*이 함수가 호출될때마다 매번 http 요청이 전송됨*/
-	async function fetchMoviesHandler() {
+	const fetchMoviesHandler = useCallback(async() =>{ /*useCallback 사용시, async 예약어 삭제 시 화살표함수 앞에 추가해주자*/
 		/*fetchMoviesHandler 함수가 작동되면 loading state 가 true 변환*/
 		setIsLoading(true)
 
@@ -78,9 +78,16 @@ function App() {
 			setError(error.message)
 		}
 		setIsLoading(false)
-	}
+	}, [])
 
-	let content = <p>영화를 찾을 수 없습니다.'</p>
+	/*어떤 의존성 배열도 추가하지않으면 컴포넌트가 최초로 로딩될때를 제외하면 함수는 재실행되지않음
+	* -아래와 같이 설정하게되면 버튼을 최초 한번 실행하게되는 결과를 갖게되며 이벤트 함수를 통한 데이터 출력이 바로 fetch 되며
+	* --만약 버튼을 클릭하게되면 의존성 배열에 해당 함수가 존재하기때문에 state 가 update 되면 최신 state 로 실행됨*/
+	useEffect(() => {
+		fetchMoviesHandler()
+	}, [fetchMoviesHandler])
+
+	let content = <p>영화를 찾을 수 없습니다.</p>
 	if (movies.length > 0) {
 		content = <MoviesList movies={movies}/>
 	}
