@@ -20,9 +20,12 @@ const dummyMovies = [
 ];*/
 function App() {
 	const [movies, setMovies] = useState([])
+	const [isLoading, setIsLoading] = useState(false)
 
 	/*이 함수가 호출될때마다 매번 http 요청이 전송됨*/
 	async function fetchMoviesHandler() {
+		/*fetchMoviesHandler 함수가 호출되면 loading state 가 true 변환*/
+		setIsLoading(true)
 
 		/*fetch func 는 browser 가 사용할수있게해준 func
 		* -첫번째 인자는 요청을 전송하려는 URL, 두 번째인자는 다양한 선택사항 지정 가능(object,request method change 기타등등)
@@ -54,6 +57,9 @@ function App() {
 		})
 		setMovies(transformedMovies) /*API 의 results 의 배열이 movies 에대한 새로운 state 가 됨*/
 		/*setMovies(data.results) /!*API 의 results 의 배열이 movies 에대한 새로운 state 가 됨*!/*/
+
+		/*data 가 출력되면 loading state 는 다시 false*/
+		setIsLoading(false)
 	}
 
 
@@ -63,7 +69,9 @@ function App() {
 					<button onClick={fetchMoviesHandler}>Fetch Movies</button>
 				</section>
 				<section>
-					<MoviesList movies={movies}/>
+					{!isLoading && movies.length > 0 && <MoviesList movies={movies}/>}
+					{!isLoading && movies.length === 0 && <p>영화 검색 결과가 없습니다.</p>}
+					{isLoading && <p>현재 로딩 중입니다... 잠시만 기다려주세요</p>}
 				</section>
 			</React.Fragment>
 	);
